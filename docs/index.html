@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shared Colony Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Shared Colony Dashboard</h1>
+    <button id="logoutBtn" class="linklike" hidden>Log out</button>
+  </header>
+
+  <!-- Login gate -->
+  <section id="loginView" class="panel">
+    <form id="loginForm">
+      <label for="passwordInput">Password</label>
+      <input id="passwordInput" type="password" autocomplete="current-password" required />
+      <button type="submit">Log in</button>
+      <p id="loginError" class="error" hidden></p>
+    </form>
+  </section>
+
+  <!-- Main dashboard -->
+  <section id="dashboardView" class="panel" hidden>
+    <div class="controls">
+      <input id="searchInput" type="search" placeholder="Search tag, genotype, mouseline, cage…" />
+      <select id="colonyFilter">
+        <option value="">All shared colonies</option>
+      </select>
+      <button id="refreshBtn">Refresh</button>
+    </div>
+
+    <p id="statusMsg" class="muted"></p>
+
+    <div class="table-wrap">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>Colony</th><th>Tag</th><th>Sex</th><th>Age (wk)</th>
+            <th>Mouseline</th><th>Genotype</th><th>Cage</th>
+            <th>Status</th><th>Reservation</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Reservation modal -->
+  <dialog id="reserveDialog">
+    <form id="reserveForm">
+      <h2>Request this animal</h2>
+      <p id="reserveSummary" class="muted"></p>
+      <label for="reqName">Your name</label>
+      <input id="reqName" type="text" required />
+      <label for="reqEmail">Your email</label>
+      <input id="reqEmail" type="email" required />
+      <div class="dialog-actions">
+        <button type="button" id="cancelReserve">Cancel</button>
+        <button type="submit">Send request</button>
+      </div>
+      <p id="reserveError" class="error" hidden></p>
+    </form>
+  </dialog>
+
+  <!-- EDIT ME: paste your Apps Script Web App "exec" URL here (Deploy > Manage deployments). -->
+  <script>
+    window.API_URL = 'https://script.google.com/macros/s/AKfycbxvtcr-vFys5UtmavgcOPgJ-c4g1lpqjr3WyqqZEpIOZjk4SB5xHw3qZonPde8JOtcm/exec';
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
