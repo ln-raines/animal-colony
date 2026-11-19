@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shared Colony Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,7 +17,7 @@
 
   <!-- Login gate -->
   <section id="loginView" class="panel">
-    <form id="loginForm">
+    <form id="loginForm" class="card login-card">
       <label for="passwordInput">Password</label>
       <input id="passwordInput" type="password" autocomplete="current-password" required />
       <button type="submit">Log in</button>
@@ -22,41 +25,142 @@
     </form>
   </section>
 
-  <!-- Main dashboard -->
-  <section id="dashboardView" class="panel" hidden>
-    <div class="controls">
-      <input id="searchInput" type="search" placeholder="Search tag, genotype, mouseline, cage…" />
-      <select id="colonyFilter">
-        <option value="">All shared colonies</option>
-      </select>
-      <button id="refreshBtn">Refresh</button>
-    </div>
+  <!-- Main app -->
+  <div id="appView" hidden>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="searchTab">Search &amp; Reserve</button>
+      <button class="tab-btn" data-tab="overviewTab">Overview</button>
+      <button class="tab-btn" data-tab="logTab">Reservation Log</button>
+    </nav>
 
-    <p id="statusMsg" class="muted"></p>
+    <!-- Search & Reserve -->
+    <section id="searchTab" class="panel tab-panel">
+      <div class="card controls-card">
+        <div class="controls-row">
+          <input id="searchInput" type="search" placeholder="Search tag, genotype, mouseline…" class="grow" />
+          <select id="colonyFilter">
+            <option value="">All shared colonies</option>
+          </select>
+          <div class="segmented" id="sexFilter">
+            <button type="button" class="seg-btn active" data-sex="">All</button>
+            <button type="button" class="seg-btn" data-sex="M">Male</button>
+            <button type="button" class="seg-btn" data-sex="F">Female</button>
+          </div>
+          <button id="refreshBtn" class="secondary">Refresh</button>
+        </div>
 
-    <div class="table-wrap">
-      <table id="resultsTable">
-        <thead>
-          <tr>
-            <th>Colony</th><th>Tag</th><th>Sex</th><th>Age (wk)</th>
-            <th>Mouseline</th><th>Genotype</th><th>Cage</th>
-            <th>Status</th><th>Reservation</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody"></tbody>
-      </table>
-    </div>
-  </section>
+        <div class="age-filter-row">
+          <label class="age-filter-label">Age range: <span id="ageRangeLabel">— w</span></label>
+          <div class="dual-slider" id="ageSlider">
+            <div class="dual-slider-track"></div>
+            <div class="dual-slider-fill" id="ageSliderFill"></div>
+            <input type="range" id="ageMin" min="0" max="150" value="0" step="1" />
+            <input type="range" id="ageMax" min="0" max="150" value="150" step="1" />
+          </div>
+        </div>
+      </div>
+
+      <p id="statusMsg" class="muted"></p>
+
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table id="resultsTable">
+            <thead>
+              <tr>
+                <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox" /></th>
+                <th>Colony</th><th>Sex</th><th>Age (wk)</th>
+                <th>Mouseline</th><th>Genotype</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="selection-bar" id="selectionBar" hidden>
+        <span id="selectionCount"></span>
+        <button id="openReserveBtn">Request selected animals</button>
+      </div>
+    </section>
+
+    <!-- Overview -->
+    <section id="overviewTab" class="panel tab-panel" hidden>
+      <div class="card controls-card">
+        <div class="controls-row">
+          <select id="overviewColonyFilter">
+            <option value="">All shared colonies</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="card stat-card">
+          <div class="stat-label">Total Animals</div>
+          <div class="stat-number" id="totalAnimals">—</div>
+        </div>
+        <div class="card chart-card">
+          <h3>Reservation Status</h3>
+          <canvas id="statusChart"></canvas>
+          <div id="statusLegend" class="legend"></div>
+        </div>
+        <div class="card chart-card">
+          <h3>Genotypes Available</h3>
+          <canvas id="genotypeChart"></canvas>
+          <div id="genotypeLegend" class="legend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reservation Log -->
+    <section id="logTab" class="panel tab-panel" hidden>
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table id="logTable">
+            <thead>
+              <tr>
+                <th>Requested</th><th>Requester</th><th>Colony</th><th>Animals</th>
+                <th>Experiment</th><th>Conditions</th><th>Per Condition</th>
+                <th>Tissues</th><th>Anticip. Age</th><th>Start Date</th>
+                <th>Status</th><th>Decided</th>
+              </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <!-- Reservation modal -->
   <dialog id="reserveDialog">
     <form id="reserveForm">
-      <h2>Request this animal</h2>
-      <p id="reserveSummary" class="muted"></p>
+      <h2>Request these animals</h2>
+      <div id="reserveSummary" class="reserve-summary"></div>
+
       <label for="reqName">Your name</label>
       <input id="reqName" type="text" required />
+
       <label for="reqEmail">Your email</label>
       <input id="reqEmail" type="email" required />
+
+      <label for="reqStartDate">Anticipated start date of experiment</label>
+      <input id="reqStartDate" type="date" />
+
+      <label for="reqAge">Anticipated age at start of experiment (months)</label>
+      <input id="reqAge" type="number" min="0" step="0.5" placeholder="e.g. 3" />
+
+      <label for="reqType">Type of experiment</label>
+      <input id="reqType" type="text" placeholder="Brief experiment description" />
+
+      <label for="reqConditions">Experimental conditions</label>
+      <input id="reqConditions" type="text" placeholder="e.g. control, treatment A" />
+
+      <label for="reqPerCondition">Number of animals per condition</label>
+      <input id="reqPerCondition" type="text" placeholder="e.g. 3 per group" />
+
+      <label for="reqTissues">Tissues being collected</label>
+      <textarea id="reqTissues" rows="2" placeholder="e.g. spleen, lymph node"></textarea>
+
       <div class="dialog-actions">
         <button type="button" id="cancelReserve">Cancel</button>
         <button type="submit">Send request</button>
@@ -69,6 +173,7 @@
   <script>
     window.API_URL = 'https://script.google.com/macros/s/AKfycbxvtcr-vFys5UtmavgcOPgJ-c4g1lpqjr3WyqqZEpIOZjk4SB5xHw3qZonPde8JOtcm/exec';
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
