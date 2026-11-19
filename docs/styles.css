@@ -320,6 +320,12 @@ dialog::backdrop { background: rgba(10,10,15,0.45); }
 dialog h2 { margin-top: 0; font-size: 1.15rem; }
 #reserveForm { display: flex; flex-direction: column; gap: 0.45rem; max-height: 75vh; overflow-y: auto; padding-right: 0.25rem; }
 #reserveForm label { font-weight: 600; font-size: 0.85rem; color: var(--muted); margin-top: 0.35rem; }
+/* flex-shrink: 0 matters here: any flex-column child with overflow:auto (this box,
+   and <textarea> below via the browser's own default) gets its automatic min-size
+   reset to 0 per the flexbox spec, so without this the form squashes these two
+   elements down to a sliver before it touches a plain <input> (overflow: visible,
+   so it keeps its min-content height and never shrinks). That's what was clipping
+   the summary box and the Tissues field. */
 .reserve-summary {
   background: #f4f5f7;
   border-radius: 8px;
@@ -328,7 +334,10 @@ dialog h2 { margin-top: 0; font-size: 1.15rem; }
   line-height: 1.7;
   color: var(--text);
   max-height: 160px;
+  min-height: 2.6rem;
   overflow-y: auto;
+  flex-shrink: 0;
 }
+#reserveForm textarea { flex-shrink: 0; }
 .reserve-summary div { padding: 0.1rem 0; }
 .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.6rem; }
