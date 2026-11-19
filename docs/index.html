@@ -29,12 +29,28 @@
   <div id="appView" hidden>
     <nav class="tabs">
       <button class="tab-btn active" data-tab="searchTab">Search &amp; Reserve</button>
-      <button class="tab-btn" data-tab="overviewTab">Overview</button>
       <button class="tab-btn" data-tab="logTab">Reservation Log</button>
     </nav>
 
     <!-- Search & Reserve -->
     <section id="searchTab" class="panel tab-panel">
+      <div class="overview-grid">
+        <div class="card stat-card">
+          <div class="stat-label">Total Animals</div>
+          <div class="stat-number" id="totalAnimals">—</div>
+        </div>
+        <div class="card chart-card">
+          <h3>Reservation Status</h3>
+          <canvas id="statusChart"></canvas>
+          <div id="statusLegend" class="legend"></div>
+        </div>
+        <div class="card chart-card">
+          <h3>Genotypes Available</h3>
+          <canvas id="genotypeChart"></canvas>
+          <div id="genotypeLegend" class="legend"></div>
+        </div>
+      </div>
+
       <div class="card controls-card">
         <div class="controls-row">
           <input id="searchInput" type="search" placeholder="Search tag, genotype, mouseline…" class="grow" />
@@ -46,11 +62,15 @@
             <button type="button" class="seg-btn" data-sex="M">Male</button>
             <button type="button" class="seg-btn" data-sex="F">Female</button>
           </div>
+          <label class="toggle-check">
+            <input type="checkbox" id="availableOnlyToggle" checked />
+            Available only
+          </label>
           <button id="refreshBtn" class="secondary">Refresh</button>
         </div>
 
         <div class="age-filter-row">
-          <label class="age-filter-label">Age range: <span id="ageRangeLabel">— w</span></label>
+          <label class="age-filter-label">Age range: <span id="ageRangeLabel">—</span></label>
           <div class="dual-slider" id="ageSlider">
             <div class="dual-slider-track"></div>
             <div class="dual-slider-fill" id="ageSliderFill"></div>
@@ -68,8 +88,8 @@
             <thead>
               <tr>
                 <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox" /></th>
-                <th>Colony</th><th>Sex</th><th>Age (wk)</th>
-                <th>Mouseline</th><th>Genotype</th>
+                <th>Colony</th><th>Sex</th><th>Age (wk / mo)</th>
+                <th>Mouseline</th><th>Genotype</th><th>Status</th><th>Reserved/Requested By</th>
               </tr>
             </thead>
             <tbody id="resultsBody"></tbody>
@@ -80,34 +100,6 @@
       <div class="selection-bar" id="selectionBar" hidden>
         <span id="selectionCount"></span>
         <button id="openReserveBtn">Request selected animals</button>
-      </div>
-    </section>
-
-    <!-- Overview -->
-    <section id="overviewTab" class="panel tab-panel" hidden>
-      <div class="card controls-card">
-        <div class="controls-row">
-          <select id="overviewColonyFilter">
-            <option value="">All shared colonies</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="overview-grid">
-        <div class="card stat-card">
-          <div class="stat-label">Total Animals</div>
-          <div class="stat-number" id="totalAnimals">—</div>
-        </div>
-        <div class="card chart-card">
-          <h3>Reservation Status</h3>
-          <canvas id="statusChart"></canvas>
-          <div id="statusLegend" class="legend"></div>
-        </div>
-        <div class="card chart-card">
-          <h3>Genotypes Available</h3>
-          <canvas id="genotypeChart"></canvas>
-          <div id="genotypeLegend" class="legend"></div>
-        </div>
       </div>
     </section>
 

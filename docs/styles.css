@@ -4,8 +4,10 @@
   --card-bg: #ffffff;
   --text: #1f2430;
   --muted: #6b7280;
-  --accent: #3c6e47;
-  --accent-dark: #2d5436;
+  --accent: #e8664a;
+  --accent-dark: #c24c33;
+  --header-blue: #3a6b8a;
+  --header-blue-dark: #254b63;
   --available: #bfe3c8;
   --available-text: #1f5c33;
   --requested: #ffe6a3;
@@ -30,7 +32,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 1.1rem 1.75rem;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  background: linear-gradient(135deg, var(--header-blue), var(--header-blue-dark));
   color: white;
 }
 .topbar h1 { font-size: 1.2rem; margin: 0; font-weight: 700; letter-spacing: 0.01em; }
@@ -266,13 +268,27 @@ tbody tr:hover { background: #f9fbf9; }
   justify-content: center;
   text-align: center;
 }
-.stat-label { color: var(--muted); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.04em; }
-.stat-number { font-size: 3rem; font-weight: 900; color: var(--accent-dark); }
-.chart-card h3 { margin: 0 0 0.75rem; font-size: 1rem; color: var(--text); }
-.chart-card canvas { max-height: 220px; }
-.legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.75rem; font-size: 0.85rem; }
-.legend-item { display: flex; align-items: center; gap: 0.4rem; }
-.legend-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.stat-label { color: var(--muted); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.stat-number { font-size: 2.6rem; font-weight: 900; color: var(--accent-dark); }
+.chart-card { padding: 0.9rem 1rem; }
+.chart-card h3 { margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--text); }
+.chart-card canvas { max-height: 150px; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; margin-top: 0.6rem; font-size: 0.78rem; }
+.legend-item { display: flex; align-items: center; gap: 0.35rem; }
+.legend-swatch { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+
+/* Available-only toggle */
+.toggle-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.toggle-check input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
 
 /* Badges reused for reservation-log status */
 .badge {

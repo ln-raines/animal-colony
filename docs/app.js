@@ -59,6 +59,7 @@ function showApp() {
   logoutBtn.hidden = false;
   initTabs();
   runSearch({ resetAgeBounds: true });
+  loadStats();
 }
 
 function showLogin() {
@@ -114,7 +115,6 @@ function initTabs() {
       btn.classList.add('active');
       const panel = document.getElementById(btn.dataset.tab);
       panel.hidden = false;
-      if (btn.dataset.tab === 'overviewTab') loadStats();
       if (btn.dataset.tab === 'logTab') loadReservationLog();
     });
   });
@@ -139,10 +139,19 @@ const ageMax = document.getElementById('ageMax');
 const ageSliderFill = document.getElementById('ageSliderFill');
 const ageRangeLabel = document.getElementById('ageRangeLabel');
 
+const availableOnlyToggle = document.getElementById('availableOnlyToggle');
+
 let rawResults = [];
 let selectedRows = new Set();
 let currentSex = '';
 let ageBoundsInitialized = false;
+
+/** Rough weeks -> months, just for display (matches the ~30.44-day month the sheet's Age (months) formula uses). */
+function weeksToMonths(weeks) {
+  return Math.round((weeks / 30.44) * 7 * 10) / 10;
+}
+
+availableOnlyToggle.addEventListener('change', applyFiltersAndRender);
 
 // --- sex filter ---
 document.getElementById('sexFilter').addEventListener('click', (ev) => {
@@ -161,7 +170,7 @@ function updateSliderFill() {
   const pct = v => ((v - min) / (max - min || 1)) * 100;
   ageSliderFill.style.left = pct(lo) + '%';
   ageSliderFill.style.right = (100 - pct(hi)) + '%';
-  ageRangeLabel.textContent = `${lo} – ${hi} w`;
+  ageRangeLabel.textContent = `${lo}w (${weeksToMonths(lo)}mo) – ${hi}w (${weeksToMonths(hi)}mo)`;
 }
 
 function setAgeBounds(min, max) {
@@ -196,7 +205,6 @@ async function runSearch(opts) {
     });
     rawResults = data.results || [];
     populateColonySelect(colonyFilter, data.colonies || []);
-    populateColonySelect(document.getElementById('overviewColonyFilter'), data.colonies || []);
 
     if (!ageBoundsInitialized || opts.resetAgeBounds) {
       const ages = rawResults.map(r => Number(r.ageWeeks)).filter(n => !isNaN(n) && isFinite(n));
@@ -225,6 +233,7 @@ function applyFiltersAndRender() {
   const lo = Number(ageMin.value), hi = Number(ageMax.value);
   const filtered = rawResults.filter(r => {
     if (currentSex && r.sex !== currentSex) return false;
+    if (availableOnlyToggle.checked && (r.reservationState || 'Available') !== 'Available') return false;
     const age = Number(r.ageWeeks);
     if (!isNaN(age) && isFinite(age)) {
       if (age < lo || age > hi) return false;
@@ -239,14 +248,21 @@ function applyFiltersAndRender() {
 function renderResults(rows) {
   resultsBody.innerHTML = rows.map(r => {
     const checked = selectedRows.has(r.row) ? 'checked' : '';
+    const state = r.reservationState || 'Available';
+    const stateClass = state.toLowerCase();
+    const whoFor = state === 'Reserved' ? r.reservedBy : (state === 'Requested' ? r.requestBy : '');
+    const months = r.ageWeeks !== '' && r.ageWeeks !== undefined ? weeksToMonths(Number(r.ageWeeks)) : '';
+    const ageDisplay = r.ageWeeks !== '' && r.ageWeeks !== undefined ? `${r.ageWeeks}w (${months}mo)` : '';
     return `
       <tr>
         <td><input type="checkbox" class="rowCheckbox" data-row="${r.row}" ${checked} /></td>
         <td>${escapeHtml(r.colony)}</td>
         <td>${escapeHtml(r.sex)}</td>
-        <td>${escapeHtml(r.ageWeeks)}</td>
+        <td>${escapeHtml(ageDisplay)}</td>
         <td>${escapeHtml(r.mouseline)}</td>
         <td>${escapeHtml(r.genotype)}</td>
+        <td><span class="badge ${stateClass}">${escapeHtml(state)}</span></td>
+        <td>${escapeHtml(whoFor)}</td>
       </tr>`;
   }).join('');
 
@@ -278,8 +294,8 @@ function updateSelectionBar() {
 }
 
 searchInput.addEventListener('input', debounce(() => runSearch(), 350));
-colonyFilter.addEventListener('change', () => runSearch({ resetAgeBounds: true }));
-refreshBtn.addEventListener('click', () => runSearch());
+colonyFilter.addEventListener('change', () => { runSearch({ resetAgeBounds: true }); loadStats(); });
+refreshBtn.addEventListener('click', () => { runSearch(); loadStats(); });
 
 function debounce(fn, ms) {
   let t;
@@ -346,6 +362,7 @@ reserveForm.addEventListener('submit', async (ev) => {
     reserveDialog.close();
     statusMsg.textContent = 'Request sent — the colony owner has been emailed for approval.';
     runSearch();
+    loadStats();
   } catch (err) {
     reserveError.textContent = err.message;
     reserveError.hidden = false;
@@ -353,20 +370,17 @@ reserveForm.addEventListener('submit', async (ev) => {
 });
 
 // ============================================================
-// Overview tab
+// Overview (shown at the top of Search & Reserve)
 // ============================================================
 
-const overviewColonyFilter = document.getElementById('overviewColonyFilter');
 let statusChartInstance = null;
 let genotypeChartInstance = null;
 
-const CHART_PALETTE = ['#3c6e47', '#e8a33d', '#c25b5b', '#4f7cac', '#8a5fbf', '#3d9a8c', '#d4845c', '#6b7280'];
-
-overviewColonyFilter.addEventListener('change', loadStats);
+const CHART_PALETTE = ['#e8664a', '#3a6b8a', '#e8a33d', '#4f7cac', '#8a5fbf', '#3d9a8c', '#d4845c', '#6b7280'];
 
 async function loadStats() {
   try {
-    const data = await apiPost('stats', { token: getToken(), colony: overviewColonyFilter.value });
+    const data = await apiPost('stats', { token: getToken(), colony: colonyFilter.value });
     document.getElementById('totalAnimals').textContent = data.total;
 
     renderDonut('statusChart', 'statusLegend', data.byState, {
