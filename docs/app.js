@@ -353,8 +353,6 @@ reserveForm.addEventListener('submit', async (ev) => {
       rows: selected.map(r => r.row),
       requesterName: document.getElementById('reqName').value.trim(),
       requesterEmail: document.getElementById('reqEmail').value.trim(),
-      startDate: document.getElementById('reqStartDate').value,
-      anticipatedAgeMonths: document.getElementById('reqAge').value,
       experimentType: document.getElementById('reqType').value.trim(),
       conditions: document.getElementById('reqConditions').value.trim(),
       animalsPerCondition: document.getElementById('reqPerCondition').value.trim(),
