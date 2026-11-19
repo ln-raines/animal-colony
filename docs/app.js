@@ -240,6 +240,7 @@ function applyFiltersAndRender() {
     }
     return true;
   });
+  filtered.sort((a, b) => (Number(b.ageWeeks) || 0) - (Number(a.ageWeeks) || 0)); // oldest first
   renderResults(filtered);
   statusMsg.textContent = filtered.length + ' animal(s) found.';
   updateSelectionBar();
@@ -447,4 +448,3 @@ async function loadReservationLog() {
     if (handleSessionError(err)) return;
   }
 }
-
