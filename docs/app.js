@@ -361,14 +361,17 @@ reserveForm.addEventListener('submit', async (ev) => {
       tissues: document.getElementById('reqTissues').value.trim()
     });
     reserveDialog.close();
-    statusMsg.textContent = result.warning
+    const message = result.warning
       ? 'Request recorded, but: ' + result.warning
       : 'Request sent — the colony owner has been emailed for approval.';
+    statusMsg.textContent = message;
+    window.alert(message); // guaranteed-visible confirmation, since the page can scroll past statusMsg
     runSearch();
     loadStats();
   } catch (err) {
     reserveError.textContent = err.message;
     reserveError.hidden = false;
+    window.alert('Could not send request: ' + err.message);
   }
 });
 
