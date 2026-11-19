@@ -447,3 +447,4 @@ async function loadReservationLog() {
     if (handleSessionError(err)) return;
   }
 }
+
