@@ -326,8 +326,8 @@ openReserveBtn.addEventListener('click', () => {
   }
 
   reserveSummary.innerHTML = selected.map(r =>
-    `${escapeHtml(r.colony)} — ${escapeHtml(r.sex)}, ${escapeHtml(r.genotype)}, ${escapeHtml(r.ageWeeks)}w`
-  ).join('<br>');
+    `<div>${escapeHtml(r.colony)} — ${escapeHtml(r.sex)}, ${escapeHtml(r.genotype)}, ${escapeHtml(r.ageWeeks)}w</div>`
+  ).join('');
 
   reserveForm.reset();
   reserveDialog.showModal();
@@ -348,7 +348,7 @@ reserveForm.addEventListener('submit', async (ev) => {
   }
 
   try {
-    await apiPost('reserve', {
+    const result = await apiPost('reserve', {
       token: getToken(),
       rows: selected.map(r => r.row),
       requesterName: document.getElementById('reqName').value.trim(),
@@ -361,7 +361,9 @@ reserveForm.addEventListener('submit', async (ev) => {
       tissues: document.getElementById('reqTissues').value.trim()
     });
     reserveDialog.close();
-    statusMsg.textContent = 'Request sent — the colony owner has been emailed for approval.';
+    statusMsg.textContent = result.warning
+      ? 'Request recorded, but: ' + result.warning
+      : 'Request sent — the colony owner has been emailed for approval.';
     runSearch();
     loadStats();
   } catch (err) {
